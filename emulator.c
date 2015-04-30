@@ -5,7 +5,7 @@
 void printReg(long *reg){
    int ndx = 0;
    while(ndx < 32){
-      printf("$%d: %X", ndx, (int)reg[ndx]);
+      printf("$%d: %08X", ndx, (int)reg[ndx]);
       if(ndx++ % 2)
          printf("\n");
       else
