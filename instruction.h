@@ -8,11 +8,11 @@ typedef struct {
    short rd;
    short shamt;
    short funct;
-   int imm;
+   long imm;
 } Instruction;
 
 void decode(Instruction *instr, int *pc);
 
-int execute(Instruction *instr, int *pc, int *reg, int *mem, int *cycles, int *memRefs);
+int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int *memRefs);
 
 #endif

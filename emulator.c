@@ -2,10 +2,10 @@
 #include "instruction.h"
 #define MAX_MEMORY 1000
 
-void printReg(int *reg){
+void printReg(long *reg){
    int ndx = 0;
    while(ndx < 32){
-      printf("$%d: %X", ndx, reg[ndx]);
+      printf("$%d: %X", ndx, (int)reg[ndx]);
       if(ndx++ % 2)
          printf("\n");
       else
@@ -14,18 +14,19 @@ void printReg(int *reg){
 }
 
 void run(int *mem, char sr){
-   int *pc = mem, reg[32] = {0}, instrCount = 0, memRefs = 0, cycles = 0;
+   int *pc = mem, instrCount = 0, memRefs = 0, cycles = 0;
+   long reg[32] = {0};
    Instruction instr;
    if(sr == 'r'){
-      for(decode(&instr, pc); execute(&instr, pc, reg, mem, &cycles, &memRefs); decode(&instr, pc))
+      for(decode(&instr, pc); execute(&instr, &pc, reg, mem, &cycles, &memRefs); decode(&instr, pc))
          instrCount++;
       instrCount++;
       printReg(reg);
    }
    else
-      for(sr = getchar(), decode(&instr, pc); sr != 'q' && execute(&instr, pc, reg, mem, &cycles, &memRefs); sr = getchar(), decode(&instr, pc)){
+      for(scanf("%c", &sr), decode(&instr, pc); sr != 'q' && execute(&instr, &pc, reg, mem, &cycles, &memRefs); scanf("%c", &sr), decode(&instr, pc)){
          if(sr == 'r'){
-            for(decode(&instr, pc); execute(&instr, pc, reg, mem, &cycles, &memRefs); decode(&instr, pc))
+            for(decode(&instr, pc); execute(&instr, &pc, reg, mem, &cycles, &memRefs); decode(&instr, pc))
                instrCount++;
             sr = 'q';
          }

@@ -10,7 +10,7 @@ const int R_FUNC_CODES[] = {0x24,0x25,0x20,0x21,0x00,0x02,0x03,0x22,0x2B,0x08,0x
 const int I_OPCODES[] = {0x08,0x09,0x0B,4,5,0x23,0x2B,0x0D,0x0F};
 
 void decode(Instruction *instr, int *pc){
-   instr->opcode = *pc >> 26;
+   instr->opcode = *pc >> 26 & 0x3F;
    switch (instr->opcode){
       case R:
          instr->rs = *pc >> 21 & MASK;
@@ -31,7 +31,7 @@ void decode(Instruction *instr, int *pc){
 }
 
 // returns 1 if executed, 0 if there is a halt instruction
-int execute(Instruction *instr, int *pc, int *reg, int *mem, int *cycles, int *memRefs){
+int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int *memRefs){
    int func, br, ret = 1;
    (*pc)++;
    switch (instr->opcode){
@@ -68,8 +68,8 @@ int execute(Instruction *instr, int *pc, int *reg, int *mem, int *cycles, int *m
                reg[instr->rd] = ((unsigned int)reg[instr->rs] < (unsigned int)reg[instr->rt]) ? 1 : 0;
                break;
             case 9: //jr
-               reg[31] = *pc;
-               *pc = reg[instr->rs];
+               reg[31] = (long)*pc;
+               *pc = (int *)reg[instr->rs];
                break;
             case 10: //syscall (assume halt)
                ret = 0;
@@ -77,11 +77,11 @@ int execute(Instruction *instr, int *pc, int *reg, int *mem, int *cycles, int *m
          }
          break;
       case J:
-         *pc = instr->imm;
+         *pc = (int *)instr->imm;
          break;
       case JAL:
-         reg[31] = *pc;
-         *pc = instr->imm;
+         reg[31] = (long)*pc;
+         *pc = (int *)instr->imm;
          break;
       default:
          for(func = 0, br = 1; br; func++)
