@@ -78,11 +78,11 @@ int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int 
          }
          break;
       case J:
-         *pc += instr->imm / 4;
+         *pc = mem + instr->imm;
          break;
       case JAL:
          reg[31] = (long)*pc;
-         *pc += instr->imm / 4;
+         *pc = mem + instr->imm;
          break;
       default:
          for(func = 0, br = 1; br;)
@@ -98,16 +98,15 @@ int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int 
                reg[instr->rt] = (unsigned int)reg[instr->rs] + (unsigned int)instr->imm;
                break;
             case 2: //sltiu
-               if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
                reg[instr->rt] = reg[instr->rs] < instr->imm ? 1 : 0;
                break;
             case 3: //beq
-               if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
-               if(reg[instr->rs] == reg[instr->rt]) *pc += instr->imm / 4;
+               if(instr->imm >> 15) instr->imm |= 0xFFFFFFFFFFFF0000;
+               if((int)reg[instr->rs] == (int)reg[instr->rt]) *pc += instr->imm - 1;
                break;
             case 4: //bne
-               if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
-               if(reg[instr->rs] != reg[instr->rt]) *pc += instr->imm / 4;
+               if(instr->imm >> 15) instr->imm |= 0xFFFFFFFFFFFF0000;
+               if((int)reg[instr->rs] != (int)reg[instr->rt]) *pc += instr->imm - 1;
                break;
             case 5: //lw
                if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
