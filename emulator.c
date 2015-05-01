@@ -21,7 +21,6 @@ void run(int *mem, char sr){
       for(decode(&instr, pc); execute(&instr, &pc, reg, mem, &cycles, &memRefs); decode(&instr, pc))
          instrCount++;
       instrCount++;
-      printReg(reg);
    }
    else
       for(scanf("%c", &sr), decode(&instr, pc); sr != 'q' && execute(&instr, &pc, reg, mem, &cycles, &memRefs); scanf("%c", &sr), decode(&instr, pc)){
@@ -35,6 +34,7 @@ void run(int *mem, char sr){
       }
 
    printf("\nInstructions Executed: %d\nMemory References: %d\nClock Cycles: %d\n", instrCount, memRefs, cycles);
+   printReg(reg);
 }
 
 int main(int argc, char **argv){

@@ -1,4 +1,5 @@
 #include "instruction.h"
+#include <stdio.h>
 
 #define R 0
 #define J 2
@@ -32,7 +33,9 @@ void decode(Instruction *instr, int *pc){
 
 // returns 1 if executed, 0 if there is a halt instruction
 int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int *memRefs){
+   printf("[%p] %08X\n", *pc, **pc);
    int func, br, ret = 1;
+   int *temp;
    (*pc)++;
    switch (instr->opcode){
       case R:
@@ -69,8 +72,9 @@ int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int 
                reg[instr->rd] = ((unsigned int)reg[instr->rs] < (unsigned int)reg[instr->rt]) ? 1 : 0;
                break;
             case 9: //jr
-               reg[31] = (long)*pc;
+               temp = *pc;
                *pc = (int *)reg[instr->rs];
+               reg[31] = (long)temp;
                break;
             case 10: //syscall (assume halt)
                ret = 0;
