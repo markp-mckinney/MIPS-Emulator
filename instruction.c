@@ -79,6 +79,7 @@ int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int 
                break;
             case 10: //syscall (assume halt)
                ret = 0;
+               *cycles -= 3;
                break;
          }
          break;
