@@ -39,6 +39,7 @@ int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int 
    (*pc)++;
    switch (instr->opcode){
       case R:
+         *cycles += 4;
          for(func = 0, br = 1; br;)
             if(R_FUNC_CODES[func] == instr->funct)
                br = 0;
@@ -83,10 +84,12 @@ int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int 
          break;
       case J:
          *pc = mem + instr->imm;
+         *cycles += 3;
          break;
       case JAL:
          reg[31] = (long)*pc;
          *pc = mem + instr->imm;
+         *cycles += 3;
          break;
       default:
          for(func = 0, br = 1; br;)
@@ -97,36 +100,45 @@ int execute(Instruction *instr, int **pc, long *reg, int *mem, int *cycles, int 
             case 0: //addi
                if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
                reg[instr->rt] = reg[instr->rs] + instr->imm;
+               *cycles += 4;
                break;
             case 1: //addiu
                reg[instr->rt] = (unsigned int)reg[instr->rs] + (unsigned int)instr->imm;
+               *cycles += 4;
                break;
             case 2: //sltiu
                reg[instr->rt] = reg[instr->rs] < instr->imm ? 1 : 0;
+               *cycles += 4;
                break;
             case 3: //beq
                if(instr->imm >> 15) instr->imm |= 0xFFFFFFFFFFFF0000;
                if((int)reg[instr->rs] == (int)reg[instr->rt]) *pc += instr->imm - 1;
+               *cycles += 3;
                break;
             case 4: //bne
                if(instr->imm >> 15) instr->imm |= 0xFFFFFFFFFFFF0000;
                if((int)reg[instr->rs] != (int)reg[instr->rt]) *pc += instr->imm - 1;
+               *cycles += 3;
                break;
             case 5: //lw
                if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
                reg[instr->rt] = mem[reg[instr->rs] + instr->imm];
                (*memRefs)++;
+               *cycles += 5;
                break;
             case 6: //sw
                if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
                mem[reg[instr->rs] + instr->imm] = reg[instr->rt];
                (*memRefs)++;
+               *cycles += 4;
                break;
             case 7: //ori
                reg[instr->rt] = reg[instr->rs] | instr->imm;
+               *cycles += 4;
                break;
             case 8: //lui
                reg[instr->rt] = instr->imm << 16;
+               *cycles += 4;
                break;
          }
          break;
