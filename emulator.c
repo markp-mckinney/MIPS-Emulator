@@ -5,7 +5,10 @@
 void printReg(long *reg){
    int ndx = 0;
    while(ndx < 32){
-      printf("$%d: %08X", ndx, (int)reg[ndx]);
+      printf("$%d: ", ndx);
+      if(ndx < 10)
+         printf(" ");
+      printf("%08X", (int)reg[ndx]);
       if(ndx++ % 2)
          printf("\n");
       else
@@ -22,16 +25,19 @@ void run(int *mem, char sr){
          instrCount++;
       instrCount++;
    }
-   else
+   else{
       for(scanf("%c", &sr), decode(&instr, pc); sr != 'q' && execute(&instr, &pc, reg, mem, &cycles, &memRefs); scanf("%c", &sr), decode(&instr, pc)){
-         if(sr == 'r'){
-            for(decode(&instr, pc); execute(&instr, &pc, reg, mem, &cycles, &memRefs); decode(&instr, pc))
-               instrCount++;
-            sr = 'q';
-         }
          instrCount++;
          printReg(reg);
+         if(sr == 'r')
+            break;
       }
+      if(sr == 'r'){
+         for(decode(&instr, pc); execute(&instr, &pc, reg, mem, &cycles, &memRefs); decode(&instr, pc))
+               instrCount++;
+      }
+      instrCount++;
+   }
 
    printf("\nInstructions Executed: %d\nMemory References: %d\nClock Cycles: %d\n", instrCount, memRefs, cycles);
    printReg(reg);
