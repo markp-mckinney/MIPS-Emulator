@@ -5,6 +5,8 @@
 
 /**
  * Writeback phase has no out bucket.
+ * Writeback phase is responsible for taking the result of the operation and
+ * writing it to a register.
  */
 
 typedef struct {
