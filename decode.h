@@ -11,10 +11,13 @@
  */
 typedef struct {
    int ready;
-   int target;
-   int source;
-   int destination;
-   int opcode;
+   short opcode;
+   short rs;
+   short rt;
+   short rd;
+   short shamt;
+   short funct;
+   long imm;
 } DecodeExecute;
 
 

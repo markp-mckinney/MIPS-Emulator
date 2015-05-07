@@ -14,5 +14,6 @@ it: $(DEPS)
 clean:
 	touch $(TARGET)
 	touch $(DEPS)
+	touch a.gch
 	rm *.o $(TARGET)
 	rm *.gch
