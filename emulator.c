@@ -31,6 +31,7 @@ void printReg(long *reg, Fetch *fPhase, Decode *dPhase, Execute *ePhase,
 void run(int *mem, char sr){
    int *pc = mem, instrCount = 0, memRefs = 0, cycles = 0;
    long reg[32] = {0};
+   int halt = 0, flush = 0;
 
    FetchDecode *ifIdBucket = malloc(sizeof(FetchDecode));
    DecodeExecute *idExBucket = malloc(sizeof(DecodeExecute));
@@ -39,14 +40,18 @@ void run(int *mem, char sr){
 
    Fetch *fetchPhase = FetchInit(pc, mem, ifIdBucket);
    Decode *decodePhase = DecodeInit(reg, ifIdBucket, idExBucket);
-   Execute *executePhase = ExecuteInit(idExBucket, exMemBucket);
+   Execute *executePhase = ExecuteInit(pc, mem, idExBucket, exMemBucket);
    MemAccess *memAccessPhase = MemAccessInit(mem, exMemBucket, memWbBucket);
    Writeback *writebackPhase = WritebackInit(pc, reg, memWbBucket);
 
-   while (sr == 's') {
+   while (sr == 's' && !halt) {
       WritebackPhase(writebackPhase);
       MemAccessPhase(memAccessPhase);
-      ExecutePhase(executePhase);
+      ExecutePhase(executePhase, &halt, &flush);
+      if (flush) {
+         ifIdBucket->ready = 0;
+         idExBucket->ready = 0;
+      }
       DecodePhase(decodePhase);
       FetchPhase(fetchPhase);
       cycles++;
@@ -56,10 +61,14 @@ void run(int *mem, char sr){
 
       scanf("%c", &sr);
    }
-   if (sr == 'r') {
+   while (sr == 'r' && !halt) {
       WritebackPhase(writebackPhase);
       MemAccessPhase(memAccessPhase);
-      ExecutePhase(executePhase);
+      ExecutePhase(executePhase, &halt, &flush);
+      if (flush) {
+         ifIdBucket->ready = 0;
+         idExBucket->ready = 0;
+      }
       DecodePhase(decodePhase);
       FetchPhase(fetchPhase);
       cycles++;

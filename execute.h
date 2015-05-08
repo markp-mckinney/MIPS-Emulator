@@ -5,6 +5,7 @@
 
 #define OPERATION_READ  1
 #define OPERATION_WRITE 2
+#define OPERATION_NONE  0
 
 /**
  * Out-bucket for the execute phase, in-bucket for the memory access phase.
@@ -17,6 +18,7 @@ typedef struct {
    int address;
    int reg;
    int operation;
+   int value;
 } ExecuteMemAccess;
 
 
@@ -24,10 +26,13 @@ typedef struct {
    int count;
    DecodeExecute *inBucket;
    ExecuteMemAccess *outBucket;
+   int *pc;
+   int *mem;
 } Execute;
 
 
-Execute *ExecuteInit(DecodeExecute *inBucket, ExecuteMemAccess *outBucket);
+Execute *ExecuteInit(int *pc, int *mem, DecodeExecute *inBucket,
+      ExecuteMemAccess *outBucket);
 
 /**
  * Now that all values have been resolved, do the operation.
@@ -35,7 +40,7 @@ Execute *ExecuteInit(DecodeExecute *inBucket, ExecuteMemAccess *outBucket);
  * notify the memory access phase that something needs to be done by 
  * writing to the out bucket.
  */
-void ExecutePhase(Execute *execute);
+void ExecutePhase(Execute *execute, int *halt, int *flush);
 
 #endif
 
