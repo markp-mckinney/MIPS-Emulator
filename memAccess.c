@@ -2,7 +2,7 @@
 #include "memAccess.h"
 #include "execute.h"
 
-MemAccess *MemAccessInit(int *pc, ExecuteMemAccess *inBucket,
+MemAccess *MemAccessInit(int *mem, ExecuteMemAccess *inBucket,
    MemAccessWriteback *outBucket) {
    
    MemAccess *memacc = malloc(sizeof(MemAccess));

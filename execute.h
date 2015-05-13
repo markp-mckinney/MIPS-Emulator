@@ -27,12 +27,12 @@ typedef struct {
    int count;
    DecodeExecute *inBucket;
    ExecuteMemAccess *outBucket;
-   int *pc;
+   int **pc;
    int *mem;
 } Execute;
 
 
-Execute *ExecuteInit(int *pc, int *mem, DecodeExecute *inBucket,
+Execute *ExecuteInit(int **pc, int *mem, DecodeExecute *inBucket,
       ExecuteMemAccess *outBucket);
 
 /**

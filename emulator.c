@@ -40,9 +40,9 @@ void run(int *mem, char sr){
 
    Fetch *fetchPhase = FetchInit(&pc, ifIdBucket);
    Decode *decodePhase = DecodeInit(reg, ifIdBucket, idExBucket);
-   Execute *executePhase = ExecuteInit(pc, mem, idExBucket, exMemBucket);
+   Execute *executePhase = ExecuteInit(&pc, mem, idExBucket, exMemBucket);
    MemAccess *memAccessPhase = MemAccessInit(mem, exMemBucket, memWbBucket);
-   Writeback *writebackPhase = WritebackInit(pc, reg, memWbBucket);
+   Writeback *writebackPhase = WritebackInit(&pc, reg, memWbBucket);
 
    while (sr == 's' && !halt) {
       WritebackPhase(writebackPhase);

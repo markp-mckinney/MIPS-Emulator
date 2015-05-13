@@ -13,11 +13,11 @@ typedef struct {
    int count;
    MemAccessWriteback *inBucket;
    long *reg;
-   int *pc;
+   int **pc;
 } Writeback;
 
 
-Writeback *WritebackInit(int *pc, long *reg, MemAccessWriteback *inBucket);
+Writeback *WritebackInit(int **pc, long *reg, MemAccessWriteback *inBucket);
 
 void WritebackPhase(Writeback *writeback);
 

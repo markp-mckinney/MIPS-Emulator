@@ -11,7 +11,7 @@ const int R_CODES[] = {0x24,0x25,0x20,0x21,0x00,0x02,0x03,0x22,0x2B,0x08,0xC};
                      //{"addi", "addiu", "sltiu", "beq", "bne", "lw", "sw", "ori", "lui"};
 const int I_CODES[] = {0x08,0x09,0x0B,4,5,0x23,0x2B,0x0D,0x0F};
 
-Execute *ExecuteInit(int *pc, int *mem, DecodeExecute *inBucket,
+Execute *ExecuteInit(int **pc, int *mem, DecodeExecute *inBucket,
       ExecuteMemAccess *outBucket) {
    Execute *res = malloc(sizeof(Decode));
 
