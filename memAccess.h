@@ -28,12 +28,13 @@ typedef struct {
 
 typedef struct {
    int count;
-   DecodeExecute *inBucket;
-   ExecuteMemAccess *outBucket;
+   ExecuteMemAccess *inBucket;
+   MemAccessWriteback *outBucket;
+   int *mem;
 } MemAccess;
 
 
-MemAccess *MemAccessInit(int *pc, ExecuteMemAccess *inBucket,
+MemAccess *MemAccessInit(int *mem, ExecuteMemAccess *inBucket,
       MemAccessWriteback *outBucket);
 
 void MemAccessPhase(MemAccess *memAccess);

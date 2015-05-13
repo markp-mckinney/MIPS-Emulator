@@ -36,6 +36,7 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
 
    if (instr->ready == 0)
       return;
+   instr->ready = 0;
 
    int func, br;
 
@@ -102,10 +103,10 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
                out->ready = 1;
                break;
             case 9: //jr
-               out->value = *(execute->pc);
+               out->value = **(execute->pc);
                out->reg = 31;
                *flush = 1;
-               execute->pc = execute->mem + instr->rs;
+               *execute->pc = execute->mem + instr->rs;
                out->operation = OPERATION_NONE;
                break;
             case 10: //syscall (assume halt)
@@ -114,14 +115,14 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
          }
          break;
       case J:
-         execute->pc = execute->mem + instr->imm;
+         *execute->pc = execute->mem + instr->imm;
          *flush = 1;
          break;
       case JAL:
-         out->value = *(execute->pc);
+         out->value = **(execute->pc);
          out->reg = 31;
          *flush = 1;
-         execute->pc = execute->mem + instr->imm;
+         *execute->pc = execute->mem + instr->imm;
          out->operation = OPERATION_NONE;
          out->ready = 1;
          break;

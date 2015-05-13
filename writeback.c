@@ -7,5 +7,11 @@ Writeback *WritebackInit(int **pc, long *reg, MemAccessWriteback *inBucket) {
    return wb;
 }
 void WritebackPhase(Writeback *writeback) {
+   MemAccessWriteback *in = writeback->inBucket;
 
+   if (!in->ready)
+      return;
+   in->ready = 0;
+
+   writeback->reg[in->reg] = in->val;
 }

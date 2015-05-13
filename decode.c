@@ -25,8 +25,13 @@ Decode *DecodeInit(long *reg, FetchDecode *inBucket,
  * up register values in the register file.
  */
 void DecodePhase(Decode *decode) {
+   FetchDecode *in = decode->inBucket;
    DecodeExecute *out = decode->outBucket;
    int instruction = decode->inBucket->instruction;
+
+   if (!in->ready)
+      return;
+   in->ready = 0;
 
    out->opcode = instruction >> 26 & 0x3F;
    switch (out->opcode){
