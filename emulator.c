@@ -38,7 +38,7 @@ void run(int *mem, char sr){
    ExecuteMemAccess *exMemBucket = malloc(sizeof(ExecuteMemAccess));
    MemAccessWriteback *memWbBucket = malloc(sizeof(MemAccessWriteback));
 
-   Fetch *fetchPhase = FetchInit(pc, mem, ifIdBucket);
+   Fetch *fetchPhase = FetchInit(&pc, ifIdBucket);
    Decode *decodePhase = DecodeInit(reg, ifIdBucket, idExBucket);
    Execute *executePhase = ExecuteInit(pc, mem, idExBucket, exMemBucket);
    MemAccess *memAccessPhase = MemAccessInit(mem, exMemBucket, memWbBucket);

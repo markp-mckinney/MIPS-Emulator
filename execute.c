@@ -7,9 +7,9 @@
 #define JAL 3
 #define MASK 31
                      //{"and","or","add","addu","sll","srl","sra","sub","sltu","jr","syscall"};
-const int R_FUNC_CODES[] = {0x24,0x25,0x20,0x21,0x00,0x02,0x03,0x22,0x2B,0x08,0xC};
+const int R_CODES[] = {0x24,0x25,0x20,0x21,0x00,0x02,0x03,0x22,0x2B,0x08,0xC};
                      //{"addi", "addiu", "sltiu", "beq", "bne", "lw", "sw", "ori", "lui"};
-const int I_OPCODES[] = {0x08,0x09,0x0B,4,5,0x23,0x2B,0x0D,0x0F};
+const int I_CODES[] = {0x08,0x09,0x0B,4,5,0x23,0x2B,0x0D,0x0F};
 
 Execute *ExecuteInit(int *pc, int *mem, DecodeExecute *inBucket,
       ExecuteMemAccess *outBucket) {
@@ -43,7 +43,7 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
    switch (instr->opcode){
       case R:
          for(func = 0, br = 1; br;)
-            if(R_FUNC_CODES[func] == instr->funct)
+            if(R_CODES[func] == instr->funct)
                br = 0;
             else func++;
          switch (func){
@@ -127,7 +127,7 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
          break;
       default:
          for(func = 0, br = 1; br;)
-            if(I_OPCODES[func] == instr->opcode)
+            if(I_CODES[func] == instr->opcode)
                br = 0;
             else func++;
          switch (func){

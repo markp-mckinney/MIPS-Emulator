@@ -15,12 +15,11 @@ typedef struct {
 typedef struct {
    int count;
    FetchDecode *outBucket;
-   int *pc;
-   int *mem;
+   int **pc;
 } Fetch;
 
 
-Fetch *FetchInit(int *pc, int *mem, FetchDecode *outBucket);
+Fetch *FetchInit(int **pc, FetchDecode *outBucket);
 
 /**
  * All the fetch phase does is read an instruction out of memory, put it in the

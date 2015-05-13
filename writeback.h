@@ -22,4 +22,3 @@ Writeback *WritebackInit(int *pc, long *reg, MemAccessWriteback *inBucket);
 void WritebackPhase(Writeback *writeback);
 
 #endif
-

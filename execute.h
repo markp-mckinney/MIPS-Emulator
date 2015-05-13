@@ -2,6 +2,7 @@
 #define EXECUTE_H
 
 #include "decode.h"
+#include "instruction.h"
 
 #define OPERATION_READ  1
 #define OPERATION_WRITE 2
