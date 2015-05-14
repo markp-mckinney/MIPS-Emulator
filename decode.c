@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "decode.h"
@@ -33,11 +34,15 @@ void DecodePhase(Decode *decode) {
       return;
    in->ready = 0;
 
+   if (instruction == 0) {
+	   return;
+   }
+
    out->opcode = instruction >> 26 & 0x3F;
    switch (out->opcode){
       case R:
-         out->rs = instruction >> 21 & MASK;
-         out->rt = instruction >> 16 & MASK;
+         out->rs = decode->reg[instruction >> 21 & MASK];
+         out->rt = decode->reg[instruction >> 16 & MASK];
          out->rd = instruction >> 11 & MASK;
          out->shamt = instruction >> 6 & MASK;
          out->funct = instruction & 63;
@@ -46,8 +51,9 @@ void DecodePhase(Decode *decode) {
          out->imm = instruction & 0x03FFFFFF;
          break;
       default:
-         out->rs = instruction >> 21 & MASK;
+         out->rs = decode->reg[instruction >> 21 & MASK];
          out->rt = instruction >> 16 & MASK;
+		 out->rtval = decode->reg[out->rt];
          out->imm = instruction & 0x0000FFFF;
          break;
    }

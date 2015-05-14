@@ -6,7 +6,12 @@ MemAccess *MemAccessInit(int *mem, ExecuteMemAccess *inBucket,
    MemAccessWriteback *outBucket) {
    
    MemAccess *memacc = malloc(sizeof(MemAccess));
+
+   memacc->count = 0;
+   memacc->inBucket = inBucket;
+   memacc->outBucket = outBucket;
    memacc->mem = mem;
+
    return memacc;
 }
 

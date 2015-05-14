@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "execute.h"
@@ -103,11 +104,12 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
                out->ready = 1;
                break;
             case 9: //jr
-               out->value = **(execute->pc);
+               out->value = (long) *(execute->pc);
                out->reg = 31;
                *flush = 1;
-               *execute->pc = execute->mem + instr->rs;
+               *execute->pc = (int *) instr->rs;
                out->operation = OPERATION_NONE;
+			   out->ready = 1;
                break;
             case 10: //syscall (assume halt)
                *halt = 1;
@@ -115,14 +117,14 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
          }
          break;
       case J:
-         *execute->pc = execute->mem + instr->imm;
+         *execute->pc = execute->mem + (unsigned int) instr->imm;
          *flush = 1;
          break;
       case JAL:
-         out->value = **(execute->pc);
+         out->value = (long) *(execute->pc);
          out->reg = 31;
          *flush = 1;
-         *execute->pc = execute->mem + instr->imm;
+         *execute->pc = execute->mem + (unsigned int) instr->imm;
          out->operation = OPERATION_NONE;
          out->ready = 1;
          break;
@@ -152,27 +154,37 @@ void ExecutePhase(Execute *execute, int *halt, int *flush) {
                out->ready = 1;
                break;
             case 3: //beq
-               if(instr->imm >> 15) instr->imm |= 0xFFFFFFFFFFFF0000;
-               if(instr->rs == instr->rt) *(execute->pc) += instr->imm - 1;
-               out->reg = instr->rt;
-               out->operation = OPERATION_NONE;
-               out->ready = 1;
+               if(instr->imm >> 15)
+				   instr->imm |= 0xFFFF0000;
+			   instr->rs &= 0x0FFFFFFFF;
+			   instr->rtval &= 0x0FFFFFFFF;
+               if((int) instr->rs == (int) instr->rtval) {
+				   
+				   *(execute->pc) += (int) instr->imm - 2;
+				   *flush = 1;
+			   }
                break;
             case 4: //bne
-               if(instr->imm >> 15) instr->imm |= 0xFFFFFFFFFFFF0000;
-               if(instr->rs != instr->rt) *(execute->pc) += instr->imm - 1;
-               out->operation = OPERATION_NONE;
-               out->ready = 1;
+               if(instr->imm >> 15)
+				   instr->imm |= 0xFFFF0000;
+			   instr->rs &= 0x0FFFFFFFF;
+			   instr->rtval &= 0x0FFFFFFFF;
+               if((int) instr->rs != (int) instr->rtval) {
+				   *(execute->pc) += (int) instr->imm - 2;
+				   *flush = 1;
+			   }
                break;
             case 5: //lw
-               if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
+               if(instr->imm >> 15)
+				   instr->imm |= 0xFFFF0000;
                out->address = instr->rs + instr->imm;
                out->reg = instr->rt;
                out->operation = OPERATION_READ;
                out->ready = 1;
                break;
             case 6: //sw
-               if(instr->imm >> 15) instr->imm |= 0xFFFF0000;
+               if(instr->imm >> 15)
+				   instr->imm |= 0xFFFF0000;
                out->address = instr->rs + instr->imm;
                out->value = instr->rt;
                out->operation = OPERATION_WRITE;
