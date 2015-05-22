@@ -22,7 +22,7 @@
 typedef struct {
    int ready;
    int reg;
-   int val;
+   long val;
 } MemAccessWriteback;
 
 

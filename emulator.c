@@ -44,6 +44,8 @@ void run(int *mem, char sr){
    MemAccess *memAccessPhase = MemAccessInit(mem, exMemBucket, memWbBucket);
    Writeback *writebackPhase = WritebackInit(&pc, reg, memWbBucket);
 
+   printf("Pipeline initialized\n");
+
    while (sr == 's' && !halt) {
       WritebackPhase(writebackPhase);
       MemAccessPhase(memAccessPhase);
@@ -51,6 +53,7 @@ void run(int *mem, char sr){
       if (flush) {
          ifIdBucket->ready = 0;
          idExBucket->ready = 0;
+		 flush = 0;
       }
       DecodePhase(decodePhase);
       FetchPhase(fetchPhase);
@@ -59,7 +62,7 @@ void run(int *mem, char sr){
       printReg(reg, fetchPhase, decodePhase, executePhase, memAccessPhase,
             writebackPhase);
 
-      scanf("%c", &sr);
+      scanf(" %c", &sr);
    }
    while (sr == 'r' && !halt) {
       WritebackPhase(writebackPhase);
@@ -68,6 +71,7 @@ void run(int *mem, char sr){
       if (flush) {
          ifIdBucket->ready = 0;
          idExBucket->ready = 0;
+		 flush = 0;
       }
       DecodePhase(decodePhase);
       FetchPhase(fetchPhase);
@@ -89,6 +93,7 @@ int main(int argc, char **argv){
         if(file){
             while(fscanf(file, "%X", tmp++) != EOF)
                 ;
+			printf("Program memory loaded\n");
             run(mem, *(argv[1] + 1));
         }
     }

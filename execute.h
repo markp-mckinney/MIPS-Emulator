@@ -19,7 +19,7 @@ typedef struct {
    int address;
    int reg;
    int operation;
-   int value;
+   long value;
 } ExecuteMemAccess;
 
 

@@ -12,8 +12,9 @@
 typedef struct {
    int ready;
    short opcode;
-   short rs;
-   short rt;
+   long rs;
+   long rt;
+   long rtval;
    short rd;
    short shamt;
    short funct;
