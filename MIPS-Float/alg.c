@@ -18,9 +18,7 @@ float packFloat(int sign, int exponent, int magnitude) {
 }
 
 void unpackFloat(float aV, int *sign, int *exponent, int *magnitude) {
-   printf("0x%X\n", aV);
    int a = *((int *) ((void *) &aV));
-   printf("0x%X\n", a);
    *sign = a & SIGN_MASK;
    *exponent = ((((int) a) & EXPONENT_MASK) >> EXP_SHIFT) - 127;
    *magnitude = (a & MAGNITUDE_MASK) + (MAGNITUDE_MASK + 1);
@@ -57,12 +55,18 @@ float fSum(float a, float b) {
       bExp++;
       bMag >>= 1;
    }
+   bExp++;
+   aExp++;
+   bMag >>= 1;
+   aMag >>= 1;
    printf("bExp: exp: 0x%X (%d) mag: 0x%x (%d)\n", 
          bExp, bExp, bMag, bMag);
-   if (aSign)
+   if (aSign) {
       aMag = -aMag;
-   if (bSign)
+   }
+   if (bSign) {
       bMag = -bMag;
+   }
 
    int cSign = 0, cExp = bExp, cMag;
 
@@ -72,14 +76,26 @@ float fSum(float a, float b) {
       cMag = -cMag;
    }
 
-   normalizeFloat(&cExp, &cMag);
+   if (!(cMag & EXPONENT_MASK)) {
+      cMag <<= 1;
+      cExp--;
+   }
    return packFloat(cSign, cExp, cMag);
 }
 
 float fDiff(float a, float b) {
+   return fSum(a, -b);
 }
 
 float fProd(float a, float b) {
+   int aSign, aExp, aMag;
+   int bSign, bExp, bMag;
+
+   unpackFloat(a, &aSign, &aExp, &aMag);
+   unpackFloat(b, &bSign, &bExp, &bMag);
+
+   long cMag = aMag * bMag;
+   cMag >>= 32;
 }
 
 int main(void) {
