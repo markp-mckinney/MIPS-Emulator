@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in test*.in
+do
+   echo "RUNNING TEST $i ----------------"
+   ofname=${i/.in/.out}
+   ./a.out < $i > my$ofname
+   diff -bw my$ofname $ofname
+done
