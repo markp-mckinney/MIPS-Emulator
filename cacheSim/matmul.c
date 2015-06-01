@@ -1,26 +1,61 @@
+#include <stdlib.h>
 #include <stdio.h>
 
 /*	Cache emulation - statistics generation */
 /*	Generated for CSC 315 Lab 5 */
 
+int hits;
+int misses;
+int readCount;
+int writeCount;
 
+int size;
+int ass;
 
-mem_read(int *mp)
+typedef struct {
+   int tag;
+   int valid;
+} CacheEntry;
+
+CacheEntry *cache;
+
+void init_cache(int cacheSize, int assoc) {
+   hits = misses = readCount = writeCount = 0;
+
+   ass = assoc;
+   size = cacheSize;
+
+   cache = calloc(cacheSize, sizeof(CacheEntry));
+
+   srand(0);
+}
+
+void mem_read(int *mp)
 {
+   int p = *((int *) ((void *) &mp));
+   readCount++;
    printf("Memory read from location %p\n", mp);
 }
 
-mem_write(int *mp)
+void mem_write(int *mp)
 {
+   int p = *((int *) ((void *) &mp));
+   writeCount++;
    printf("Memory write to location %p\n", mp);
 }
 
 
-int main()
+int main(int argc, char **argv)
 {
    int a[10][10], b[10][10], mult[10][10], r1, c1, r2, c2, i, j, k;
 
    int *mp1, *mp2, *mp3;
+
+   int cacheSize, associativity;
+
+   cacheSize = atoi(argv[1]);
+   associativity = atoi(argv[2]);
+   init_cache(cacheSize, associativity);
 
    printf("Size of pointer is: %d\n\n", sizeof(mp1));
 
@@ -95,5 +130,7 @@ int main()
       if(j==c2-1)
          printf("\n\n");
       }
+
+   printf("total hits: %d total misses: %d reads: %d writes: %d\n", hits, misses, readCount, writeCount);
    return 0;
 }
