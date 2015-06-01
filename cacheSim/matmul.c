@@ -1,6 +1,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+int iLog2(int x) {
+   int i;
+
+   for (i = 32; i; i--) {
+      if (x & (1 << (i - 1))) {
+         return i;
+      }
+   }
+   return 0;
+}
+
 /*	Cache emulation - statistics generation */
 /*	Generated for CSC 315 Lab 5 */
 
@@ -9,12 +20,15 @@ int misses;
 int readCount;
 int writeCount;
 
-int size;
-int ass;
+int size;   //the number of words total stored in cache
+int ass;    //the associativity of the cache
+
+int idxMask;   //mask this with the pointer to determine the index in cache
 
 typedef struct {
    int tag;
    int valid;
+   //int data; If we were actually implemting a cache, we'd use is to represent the data stored in cache, but we're just trying to determine *whether or not* the cache would have contained the memory we are trying to access.
 } CacheEntry;
 
 CacheEntry *cache;
@@ -28,20 +42,87 @@ void init_cache(int cacheSize, int assoc) {
    cache = calloc(cacheSize, sizeof(CacheEntry));
 
    srand(0);
+
+   idxMask = (1 << iLog2(cacheSize / assoc)) - 1;
+}
+
+/**
+ * Put something in cache.  We will use the following policy:
+ *  * if there are any open spaces in a spot in cache, we'll just put it there
+ *  * if not, evict an item from cache randomly
+ */
+int evict_and_replace(int p) {
+   int assoc;
+   int index = (p & idxMask) * ass;
+   int i;
+
+   for (i = 0; i < ass; i++) {
+      if (cache[index + i].valid == 0) {
+         cache[index + i].valid = 1;
+         cache[index + i].tag = p;
+         return i;
+      }
+   }
+
+   i = rand() % ass;
+   cache[index + i].tag = p;
+   return i;
 }
 
 void mem_read(int *mp)
 {
    int p = *((int *) ((void *) &mp));
+   int index = (p & idxMask) * ass;
+   int i;
+   int wordFound = 0;
+
+//   printf("Memory read from location %p: ", mp);
+
+   for (i = 0; i < ass; i++) {
+      if (cache[index + i].tag == p && cache[index + i].valid) {
+//         printf("it's a hit!  assoc %d\n", i + 1);
+         hits++;
+         wordFound = 1;
+         break;
+      }
+   }
+
+   if (!wordFound) {
+      misses++;
+      i = evict_and_replace(p);
+      //the address was not in cache... need to evict someone and put him there
+//      printf("it's a miss :( adding to assoc %d\n", i);
+   }
+
    readCount++;
-   printf("Memory read from location %p\n", mp);
 }
 
 void mem_write(int *mp)
 {
    int p = *((int *) ((void *) &mp));
+   int index = (p & idxMask) * ass;
+   int i;
+   int wordFound = 0;
+
+//   printf("Memory write to location %p: ", mp);
+
+   for (i = 0; i < ass; i++) {
+      if (cache[index + i].tag == p && cache[index + i].valid) {
+//         printf("it's a hit!  assoc %d\n", i + 1);
+         hits++;
+         wordFound = 1;
+         break;
+      }
+   }
+
+   if (!wordFound) {
+      misses++;
+      i = evict_and_replace(p);
+      //the address was not in cache... need to evict someone and put him there
+//      printf("it's a miss :( adding to assoc %d\n", i);
+   }
+
    writeCount++;
-   printf("Memory write to location %p\n", mp);
 }
 
 
@@ -52,6 +133,11 @@ int main(int argc, char **argv)
    int *mp1, *mp2, *mp3;
 
    int cacheSize, associativity;
+
+   if (argc != 3) {
+      printf("usage: ./a.out <cacheSize> <associativity>\n");
+      return 1;
+   }
 
    cacheSize = atoi(argv[1]);
    associativity = atoi(argv[2]);
